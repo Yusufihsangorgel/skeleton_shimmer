@@ -1,0 +1,16 @@
+name: skeleton_shimmer_example
+description: Example app for the skeleton_shimmer package.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.4.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  skeleton_shimmer:
+    path: ../
+
+flutter:
+  uses-material-design: true
