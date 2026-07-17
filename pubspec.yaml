@@ -12,6 +12,12 @@ topics:
   - placeholder
   - animation
 
+screenshots:
+  - description: >-
+      A skeleton feed with the shimmer sweeping across it, then the
+      loaded content taking its place.
+    path: doc/demo.gif
+
 environment:
   sdk: ^3.4.0
   flutter: ">=3.22.0"

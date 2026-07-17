@@ -1,3 +1,5 @@
+![skeleton_shimmer](doc/banner.png)
+
 # skeleton_shimmer
 
 Shimmer loading effect for Flutter, API-compatible with the `shimmer`
@@ -23,6 +25,10 @@ Shimmer.fromColors(
   ),
 )
 ```
+
+## Demo
+
+![demo](doc/demo.gif)
 
 ## Migrating from `shimmer`
 

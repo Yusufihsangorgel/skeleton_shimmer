@@ -16,7 +16,7 @@ jobs:
       - run: flutter pub get
       - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
-      - run: flutter test
+      - run: flutter test --exclude-tags demo
       - run: flutter pub get
         working-directory: example
       - run: flutter analyze
