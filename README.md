@@ -46,8 +46,10 @@ expect.
 - **Skeleton primitives**: `SkeletonBox`, `SkeletonCircle`, and
   `SkeletonLine` cover the usual placeholder shapes, so most screens
   need no custom containers.
-- **Tested**: animation lifecycle (loop counts, enable/disable, per-
-  direction sweeps) is covered by widget tests.
+- **Tested**: animation lifecycle (loop counts, enable/disable,
+  reduced-motion transitions) and the band geometry itself (a
+  pixel-level test asserts the sweep window matches the original) are
+  covered by widget tests.
 
 ## Skeleton primitives
 
@@ -58,7 +60,8 @@ expect.
 | `SkeletonLine(width, height)` | Pill-shaped text line |
 
 All take a `color` (default: a light gray for the shimmer to paint
-over). Null `width`/`height` fills the available space.
+over). Null `width`/`height` fills the available space when the
+incoming constraints are bounded.
 
 ## Notes
 
@@ -67,6 +70,12 @@ over). Null `width`/`height` fills the available space.
   the directional slide.
 - `loop: 0` (default) repeats until the widget is disposed or
   `enabled: false`.
+
+## Credits
+
+The API design and sweep geometry follow the
+[shimmer](https://pub.dev/packages/shimmer) package by HungHD (hnvn);
+this is an independent implementation.
 
 ## License
 

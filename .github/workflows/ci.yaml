@@ -17,3 +17,7 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
       - run: flutter test
+      - run: flutter pub get
+        working-directory: example
+      - run: flutter analyze
+        working-directory: example

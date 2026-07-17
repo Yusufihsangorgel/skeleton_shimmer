@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Direction the highlight sweeps across the child.
@@ -18,15 +19,16 @@ enum ShimmerDirection {
 /// Paints an animated gradient sweep over its child's opaque pixels,
 /// producing the shimmer loading effect.
 ///
-/// The API is compatible with the `shimmer` package: [Shimmer.fromColors]
-/// with `baseColor`/`highlightColor` covers the common case, and the
-/// default constructor takes a full [gradient].
+/// The API and the sweep geometry match the `shimmer` package:
+/// [Shimmer.fromColors] with `baseColor`/`highlightColor` covers the
+/// common case, and the default constructor takes a full [gradient] that
+/// is used exactly as given while the paint window slides across.
 ///
 /// When the platform requests reduced motion
-/// ([MediaQuery.disableAnimationsOf]), the sweep is frozen on the base
-/// color instead of animating.
+/// ([MediaQuery.disableAnimationsOf]), the sweep freezes instead of
+/// animating.
 class Shimmer extends StatefulWidget {
-  /// Creates a shimmer that paints [gradient] across [child].
+  /// Creates a shimmer that sweeps [gradient] across [child].
   const Shimmer({
     super.key,
     required this.child,
@@ -49,7 +51,7 @@ class Shimmer extends StatefulWidget {
     this.loop = 0,
     this.enabled = true,
   }) : gradient = LinearGradient(
-          begin: Alignment.centerLeft,
+          begin: Alignment.topLeft,
           end: Alignment.centerRight,
           colors: [
             baseColor,
@@ -65,7 +67,7 @@ class Shimmer extends StatefulWidget {
   /// gray placeholder shapes; see `SkeletonBox` and friends.
   final Widget child;
 
-  /// The gradient swept across the child.
+  /// The gradient swept across the child, used exactly as given.
   final Gradient gradient;
 
   /// Sweep direction. Defaults to [ShimmerDirection.ltr].
@@ -78,11 +80,24 @@ class Shimmer extends StatefulWidget {
   /// repeats forever.
   final int loop;
 
-  /// When false, the child is rendered as-is with no shimmer.
+  /// When false, the sweep pauses in place; the gradient keeps masking
+  /// the child, matching the `shimmer` package.
   final bool enabled;
 
   @override
   State<Shimmer> createState() => _ShimmerState();
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties
+      ..add(DiagnosticsProperty<Gradient>('gradient', gradient))
+      ..add(EnumProperty<ShimmerDirection>('direction', direction))
+      ..add(DiagnosticsProperty<Duration>('period', period))
+      ..add(IntProperty('loop', loop, defaultValue: 0))
+      ..add(FlagProperty('enabled',
+          value: enabled, ifTrue: 'enabled', ifFalse: 'disabled'));
+  }
 }
 
 class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
@@ -109,7 +124,7 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
     if (oldWidget.enabled != widget.enabled ||
         oldWidget.period != widget.period ||
         oldWidget.loop != widget.loop) {
-      _completedLoops = 0;
+      if (oldWidget.loop != widget.loop) _completedLoops = 0;
       _syncAnimation();
     }
   }
@@ -118,11 +133,11 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
       MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
   void _syncAnimation() {
+    if (widget.loop > 0 && _completedLoops >= widget.loop) return;
     if (!widget.enabled || _motionDisabled) {
       _controller.stop();
-      _controller.value = 0;
     } else if (!_controller.isAnimating) {
-      _controller.forward(from: 0);
+      _controller.forward();
     }
   }
 
@@ -142,76 +157,40 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.enabled) return widget.child;
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) => ShaderMask(
-        blendMode: BlendMode.srcATop,
-        shaderCallback: (bounds) {
-          final gradient = _directedGradient();
-          return gradient.createShader(
-            bounds,
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) => ShaderMask(
+          blendMode: BlendMode.srcIn,
+          shaderCallback: (bounds) => widget.gradient.createShader(
+            _paintRect(bounds, _controller.value),
             textDirection: Directionality.maybeOf(context),
-          );
-        },
-        child: child,
+          ),
+          child: child,
+        ),
+        // Cache the static child's picture across animation frames.
+        child: RepaintBoundary(child: widget.child),
       ),
-      child: widget.child,
     );
   }
 
-  /// The gradient oriented for [Shimmer.direction], with a transform that
-  /// slides it across the bounds as the animation progresses.
-  Gradient _directedGradient() {
-    final gradient = widget.gradient;
-    // Sweep offset in [-1, 1] fractions of the paint bounds.
-    final slide = 2.0 * _controller.value - 1.0;
-    if (gradient is! LinearGradient) {
-      // Custom gradient types are used as given; only linear gradients
-      // are re-oriented and slid.
-      return gradient;
-    }
+  /// The window the gradient is painted into: three times the child size
+  /// along the sweep axis, sliding across as [percent] advances. This is
+  /// the `shimmer` package's geometry, so the band width and travel look
+  /// identical.
+  Rect _paintRect(Rect bounds, double percent) {
+    final width = bounds.width;
+    final height = bounds.height;
+    double lerp(double from, double to) => from + (to - from) * percent;
     return switch (widget.direction) {
-      ShimmerDirection.ltr => LinearGradient(
-          colors: gradient.colors,
-          stops: gradient.stops,
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          transform: _SlidingGradientTransform(x: slide),
-        ),
-      ShimmerDirection.rtl => LinearGradient(
-          colors: gradient.colors,
-          stops: gradient.stops,
-          begin: Alignment.centerRight,
-          end: Alignment.centerLeft,
-          transform: _SlidingGradientTransform(x: -slide),
-        ),
-      ShimmerDirection.ttb => LinearGradient(
-          colors: gradient.colors,
-          stops: gradient.stops,
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          transform: _SlidingGradientTransform(y: slide),
-        ),
-      ShimmerDirection.btt => LinearGradient(
-          colors: gradient.colors,
-          stops: gradient.stops,
-          begin: Alignment.bottomCenter,
-          end: Alignment.topCenter,
-          transform: _SlidingGradientTransform(y: -slide),
-        ),
+      ShimmerDirection.ltr =>
+        Rect.fromLTWH(lerp(-width, width) - width, 0, 3 * width, height),
+      ShimmerDirection.rtl =>
+        Rect.fromLTWH(lerp(width, -width) - width, 0, 3 * width, height),
+      ShimmerDirection.ttb =>
+        Rect.fromLTWH(0, lerp(-height, height) - height, width, 3 * height),
+      ShimmerDirection.btt =>
+        Rect.fromLTWH(0, lerp(height, -height) - height, width, 3 * height),
     };
   }
-}
-
-/// Translates a gradient by a fraction of the paint bounds.
-class _SlidingGradientTransform extends GradientTransform {
-  const _SlidingGradientTransform({this.x = 0, this.y = 0});
-
-  final double x;
-  final double y;
-
-  @override
-  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) =>
-      Matrix4.translationValues(bounds.width * x, bounds.height * y, 0);
 }
