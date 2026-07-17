@@ -2,3 +2,5 @@
 build/
 pubspec.lock
 .idea/
+.metadata
+.flutter-plugins*
