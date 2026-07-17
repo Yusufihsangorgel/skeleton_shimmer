@@ -84,7 +84,7 @@ void main() {
 
     // t = 0.5: the band is centered and wide. The original's 3x-width
     // paint window yields a band spanning most of the child (measured
-    // ~0.84 x width); the pre-fix 1x window gave ~0.28 x width.
+    // measured ~0.75 x width); the pre-fix 1x window gave ~0.28 x width.
     await tester.pump(const Duration(milliseconds: 750));
     expect(await bandPixelsOnCenterline(), greaterThan(120));
     await tester.pumpWidget(const SizedBox());

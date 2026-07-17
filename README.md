@@ -71,9 +71,9 @@ incoming constraints are bounded.
 
 ## Notes
 
-- The sweep re-orients only `LinearGradient`s; a custom non-linear
-  `Gradient` passed to the default constructor is used as given, without
-  the directional slide.
+- A custom `Gradient` passed to the default constructor is used exactly
+  as given; the sweep comes from sliding the paint window across the
+  child, so it applies to any gradient type.
 - `loop: 0` (default) repeats until the widget is disposed or
   `enabled: false`.
 
