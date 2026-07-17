@@ -1,10 +1,6 @@
-![skeleton_shimmer](doc/banner.png)
+![skeleton_shimmer banner](https://raw.githubusercontent.com/Yusufihsangorgel/skeleton_shimmer/main/doc/banner.png)
 
 # skeleton_shimmer
-
-<p align="center">
-  <img src="doc/demo.gif" alt="skeleton_shimmer loading placeholders with a shimmer sweep" width="300">
-</p>
 
 Shimmer loading effect for Flutter, API-compatible with the `shimmer`
 package, with skeleton placeholder widgets and reduced-motion support.
