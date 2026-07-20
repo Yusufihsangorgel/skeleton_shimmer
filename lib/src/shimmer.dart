@@ -37,6 +37,7 @@ class Shimmer extends StatefulWidget {
     this.period = const Duration(milliseconds: 1500),
     this.loop = 0,
     this.enabled = true,
+    this.semanticsLabel,
   });
 
   /// The common two-color shimmer: [baseColor] with a [highlightColor]
@@ -50,6 +51,7 @@ class Shimmer extends StatefulWidget {
     this.period = const Duration(milliseconds: 1500),
     this.loop = 0,
     this.enabled = true,
+    this.semanticsLabel,
   }) : gradient = LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.centerRight,
@@ -83,6 +85,24 @@ class Shimmer extends StatefulWidget {
   /// When false, the sweep pauses in place; the gradient keeps masking
   /// the child, matching the `shimmer` package.
   final bool enabled;
+
+  /// Announced to a screen reader while this is on screen, as
+  /// `CircularProgressIndicator.semanticsLabel` is.
+  ///
+  /// The placeholders underneath carry no text, so without a label a skeleton
+  /// screen is silence: a user hears nothing and cannot tell whether content
+  /// is loading or the screen is simply empty. Pass a localized string, which
+  /// is why there is no English default here.
+  ///
+  /// ```dart
+  /// Shimmer.fromColors(
+  ///   baseColor: base,
+  ///   highlightColor: highlight,
+  ///   semanticsLabel: AppLocalizations.of(context).loading,
+  ///   child: const SkeletonLine(),
+  /// )
+  /// ```
+  final String? semanticsLabel;
 
   @override
   State<Shimmer> createState() => _ShimmerState();
@@ -157,6 +177,21 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final label = widget.semanticsLabel;
+    if (label != null) {
+      // liveRegion so it is announced when the skeleton appears, not only when
+      // focus happens to land on it.
+      return Semantics(
+        label: label,
+        liveRegion: true,
+        container: true,
+        child: _buildShimmer(),
+      );
+    }
+    return _buildShimmer();
+  }
+
+  Widget _buildShimmer() {
     return RepaintBoundary(
       child: AnimatedBuilder(
         animation: _controller,

@@ -26,10 +26,16 @@ class SkeletonBox extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) => Container(
-        width: width,
-        height: height,
-        decoration: BoxDecoration(color: color, borderRadius: borderRadius),
+  // A placeholder carries no information, so it must not reach a screen
+  // reader as content: without this a skeleton screen is a run of empty
+  // containers to walk through. Announce the loading state once, on the
+  // `Shimmer` above these, with its semanticsLabel.
+  Widget build(BuildContext context) => ExcludeSemantics(
+        child: Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(color: color, borderRadius: borderRadius),
+        ),
       );
 }
 
@@ -49,10 +55,12 @@ class SkeletonCircle extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+  Widget build(BuildContext context) => ExcludeSemantics(
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
       );
 }
 

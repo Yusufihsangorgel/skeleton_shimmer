@@ -49,6 +49,26 @@ expect.
 - **Reduced motion**: when the platform asks for it
   (`MediaQuery.disableAnimations`, e.g. iOS Reduce Motion), the sweep
   freezes on the base color instead of animating.
+- **Screen readers**: the placeholder shapes stay out of the semantics
+  tree, since a skeleton is decoration standing in for content that has
+  not arrived, and a run of empty containers is nothing but an obstacle
+  to walk past. Pass `semanticsLabel` to announce the loading state
+  instead:
+
+  ```dart
+  Shimmer.fromColors(
+    baseColor: base,
+    highlightColor: highlight,
+    semanticsLabel: AppLocalizations.of(context).loading,
+    child: const SkeletonLine(width: 200),
+  )
+  ```
+
+  It works like `CircularProgressIndicator.semanticsLabel`, including
+  having no default: the package cannot invent a localized string, so it
+  stays quiet rather than announcing English into every app. The label is
+  a live region, so it is read when the skeleton appears rather than only
+  when focus reaches it.
 - **Skeleton primitives**: `SkeletonBox`, `SkeletonCircle`, and
   `SkeletonLine` cover the usual placeholder shapes, so most screens
   need no custom containers.
