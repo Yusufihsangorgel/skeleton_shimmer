@@ -1,3 +1,13 @@
+## 0.2.1
+
+- Fix `Shimmer.fromColors` so `ShimmerDirection.ttb`/`.btt` actually sweep
+  vertically. The gradient's color axis was hardcoded to top-left ->
+  center-right regardless of `direction`, so on a wide/short child (most
+  skeleton shapes: list rows, cards, text lines) the highlight barely moved
+  for `ttb`/`btt` even though the paint window was sliding correctly. The
+  axis now follows `direction`: horizontal for `ltr`/`rtl`, vertical for
+  `ttb`/`btt`.
+
 ## 0.2.0
 
 - Skeleton placeholders no longer reach the semantics tree. A skeleton screen

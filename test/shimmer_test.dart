@@ -90,6 +90,61 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  testWidgets('ttb band geometry actually sweeps vertically on a wide child',
+      (tester) async {
+    // Regression: the gradient's own color axis used to stay fixed at
+    // top-left -> center-right regardless of direction, so on a wide/short
+    // child (width not tiny next to height) a ttb/btt sweep barely moved.
+    // This mirrors the ltr band-geometry test above but samples a vertical
+    // centerline, since that is the axis a ttb sweep should move along.
+    final key = GlobalKey();
+    await tester.pumpWidget(_app(
+      Center(
+        child: RepaintBoundary(
+          key: key,
+          child: Shimmer.fromColors(
+            baseColor: const Color(0xFFE0E0E0),
+            highlightColor: const Color(0xFFF5F5F5),
+            direction: ShimmerDirection.ttb,
+            child: Container(
+                width: 200, height: 40, color: const Color(0xFF000000)),
+          ),
+        ),
+      ),
+    ));
+
+    Future<int> bandPixelsOnCenterline() async {
+      final boundary =
+          key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      late final ByteData bytes;
+      await tester.runAsync(() async {
+        final image = await boundary.toImage();
+        bytes = (await image.toByteData())!;
+        image.dispose();
+      });
+      const width = 200;
+      const height = 40;
+      const x = 100;
+      var count = 0;
+      for (var y = 0; y < height; y++) {
+        final red = bytes.getUint8((y * width + x) * 4);
+        if ((red - 0xE0).abs() > 3) count++;
+      }
+      return count;
+    }
+
+    // t = 0: the highlight window is fully offscreen, centerline is base.
+    // Pre-fix, the color axis leaked in the x dimension and this was
+    // already off-base here, which is what made the sweep look frozen.
+    expect(await bandPixelsOnCenterline(), 0);
+
+    // t = 0.5: the band is centered on the vertical axis and wide relative
+    // to the child's height, same as the horizontal case above.
+    await tester.pump(const Duration(milliseconds: 750));
+    expect(await bandPixelsOnCenterline(), greaterThan(15));
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('enabled: false keeps the mask but stops the sweep',
       (tester) async {
     await tester.pumpWidget(_app(_shimmer(enabled: false)));

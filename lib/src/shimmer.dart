@@ -53,8 +53,20 @@ class Shimmer extends StatefulWidget {
     this.enabled = true,
     this.semanticsLabel,
   }) : gradient = LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.centerRight,
+          begin: switch (direction) {
+            ShimmerDirection.ltr ||
+            ShimmerDirection.rtl =>
+              Alignment.centerLeft,
+            ShimmerDirection.ttb || ShimmerDirection.btt => Alignment.topCenter,
+          },
+          end: switch (direction) {
+            ShimmerDirection.ltr ||
+            ShimmerDirection.rtl =>
+              Alignment.centerRight,
+            ShimmerDirection.ttb ||
+            ShimmerDirection.btt =>
+              Alignment.bottomCenter,
+          },
           colors: [
             baseColor,
             baseColor,
