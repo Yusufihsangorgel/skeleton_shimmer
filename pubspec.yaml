@@ -3,7 +3,7 @@ description: >-
   Shimmer loading effect and skeleton loaders for Flutter. API-compatible with
   the shimmer package, with skeleton placeholder widgets and reduced-motion
   accessibility.
-version: 0.2.1
+version: 0.2.2
 repository: https://github.com/Yusufihsangorgel/skeleton_shimmer
 
 topics:

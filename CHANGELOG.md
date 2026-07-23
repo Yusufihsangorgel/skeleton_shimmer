@@ -1,3 +1,14 @@
+## 0.2.2
+
+- Fix a frozen sweep when `loop` is increased at runtime after a finite loop
+  has already finished. Finishing a finite loop parks the controller at the
+  upper bound of its range; raising `loop` reset the completed-loop count and
+  called `forward()` to resume, but `forward()` from the upper bound does
+  nothing, so the sweep stayed frozen instead of running the added loops. It
+  now restarts from the start of the range when the controller is parked at
+  completion, and still resumes in place when `enabled` is toggled back on
+  mid-sweep.
+
 ## 0.2.1
 
 - Fix `Shimmer.fromColors` so `ShimmerDirection.ttb`/`.btt` actually sweep

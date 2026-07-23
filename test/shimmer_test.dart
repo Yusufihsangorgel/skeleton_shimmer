@@ -188,6 +188,25 @@ void main() {
     expect(tester.binding.transientCallbackCount, 0);
   });
 
+  testWidgets('raising loop after a finite loop finished resumes the sweep',
+      (tester) async {
+    // Regression: a finished finite loop left the controller parked at its
+    // upper bound. Raising loop reset the completed-loop count and resumed
+    // with a bare forward(), a no-op from the upper bound, so the sweep
+    // stayed frozen instead of running the newly requested loops.
+    await tester.pumpWidget(
+        _app(_shimmer(loop: 2, period: const Duration(milliseconds: 100))));
+    expect(tester.binding.transientCallbackCount, greaterThan(0));
+    await tester.pumpAndSettle();
+    expect(tester.binding.transientCallbackCount, 0);
+
+    await tester.pumpWidget(
+        _app(_shimmer(loop: 4, period: const Duration(milliseconds: 100))));
+    await tester.pump();
+    expect(tester.binding.transientCallbackCount, greaterThan(0));
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('toggling enabled stops and resumes the sweep', (tester) async {
     await tester.pumpWidget(_app(_shimmer(enabled: true)));
     expect(tester.binding.transientCallbackCount, greaterThan(0));

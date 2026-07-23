@@ -169,7 +169,11 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
     if (!widget.enabled || _motionDisabled) {
       _controller.stop();
     } else if (!_controller.isAnimating) {
-      _controller.forward();
+      // A finished finite loop parks the controller at the upper bound, where
+      // forward() would be a no-op; restart from 0 so a raised loop count
+      // sweeps again. Otherwise (e.g. re-enabled mid-sweep) resume in place.
+      _controller.forward(
+          from: _controller.isCompleted ? 0 : _controller.value);
     }
   }
 
