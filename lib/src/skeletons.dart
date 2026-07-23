@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 const Color _defaultBone = Color(0xFFE0E0E0);
 
 /// A rounded rectangle placeholder to put under a `Shimmer`.
-class SkeletonBox extends StatelessWidget {
+final class SkeletonBox extends StatelessWidget {
   /// Creates a [width] x [height] placeholder box.
   const SkeletonBox({
     super.key,
@@ -40,7 +40,7 @@ class SkeletonBox extends StatelessWidget {
 }
 
 /// A circular placeholder, e.g. for an avatar.
-class SkeletonCircle extends StatelessWidget {
+final class SkeletonCircle extends StatelessWidget {
   /// Creates a circular placeholder with [size] diameter.
   const SkeletonCircle({
     super.key,
@@ -65,7 +65,7 @@ class SkeletonCircle extends StatelessWidget {
 }
 
 /// A single line of placeholder text.
-class SkeletonLine extends StatelessWidget {
+final class SkeletonLine extends StatelessWidget {
   /// Creates a text-line placeholder.
   const SkeletonLine({
     super.key,

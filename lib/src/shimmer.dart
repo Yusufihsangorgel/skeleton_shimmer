@@ -27,7 +27,7 @@ enum ShimmerDirection {
 /// When the platform requests reduced motion
 /// ([MediaQuery.disableAnimationsOf]), the sweep freezes instead of
 /// animating.
-class Shimmer extends StatefulWidget {
+final class Shimmer extends StatefulWidget {
   /// Creates a shimmer that sweeps [gradient] across [child].
   const Shimmer({
     super.key,

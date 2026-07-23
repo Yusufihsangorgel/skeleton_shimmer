@@ -1,3 +1,21 @@
+## 1.0.0
+
+First stable release. From here the public API follows semantic versioning: a
+breaking change will not land without a major-version bump.
+
+- Mark `Shimmer`, `SkeletonBox`, `SkeletonCircle` and `SkeletonLine` as
+  `final`. All four are leaves: they are meant to be used and composed, not
+  extended or implemented, and nothing in the package, its tests or its example
+  subtypes them. Sealing them is what keeps the rest of 1.x additive, because
+  adding an optional parameter to a class someone has implemented is a breaking
+  change for that implementer. This is the one breaking change in the release,
+  and it is deliberately made at the boundary where breaking changes are
+  allowed: `final` cannot be added later without a 2.0.0, while removing it
+  later would break nobody. `ShimmerDirection` needs nothing, since an enum
+  cannot be extended or implemented from outside.
+- No behaviour change. The animation, the widgets, their parameters and their
+  defaults are exactly what 0.2.2 shipped.
+
 ## 0.2.2
 
 - Fix a frozen sweep when `loop` is increased at runtime after a finite loop
