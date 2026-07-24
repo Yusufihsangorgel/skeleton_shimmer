@@ -1,3 +1,9 @@
+## 1.0.1
+
+- Add `example/README.md` for pub.dev's Example tab. It describes the demo's
+  loading pattern — skeleton rows under a `Shimmer` swapped for real content —
+  with the demo gif and the key snippet. Docs only.
+
 ## 1.0.0
 
 First stable release. From here the public API follows semantic versioning: a
