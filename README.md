@@ -46,9 +46,9 @@ expect.
 
 ## What is different
 
-- **Reduced motion**: when the platform asks for it
-  (`MediaQuery.disableAnimations`, e.g. iOS Reduce Motion), the sweep
-  freezes on the base color instead of animating.
+- **Reduced motion**: the sweep freezes instead of animating when the
+  platform asks for it. [What that looks like, and what ignoring it
+  costs.](#reduced-motion)
 - **Screen readers**: the placeholder shapes stay out of the semantics
   tree, since a skeleton is decoration standing in for content that has
   not arrived, and a run of empty containers is nothing but an obstacle
@@ -76,6 +76,31 @@ expect.
   reduced-motion transitions) and the band geometry itself (a
   pixel-level test asserts the sweep window matches the original) are
   covered by widget tests.
+
+## Reduced motion
+
+![Four frames of one sweep side by side: on the left the highlight band advances across the placeholder card, on the right the same card stays flat base gray because the platform asked for reduced motion](doc/reduced-motion.png)
+
+Each row is one frame. The left card sits under the ambient `MediaQuery` and
+the right one under `disableAnimations: true`: the sweep stops, the gradient
+mask stays, so the placeholders still preview the layout that is coming.
+
+Your app wires nothing up for this. `MediaQueryData.fromView` fills the flag
+in from `AccessibilityFeatures.disableAnimations` and `Shimmer` reads it. Two
+things are worth knowing anyway:
+
+- **Ignoring the flag is worse than it sounds.** While it is set,
+  `AnimationController.forward()` runs its duration at 5% by default
+  (`AnimationBehavior.normal`), so a shimmer that kept sweeping would restart
+  every 75 ms instead of every 1500 ms. Measured on Flutter 3.41.
+- **Override `MediaQuery` with `copyWith`.** A fresh `MediaQueryData(...)`
+  anywhere above a `Shimmer` resets `disableAnimations` to false, and then the
+  sweep runs for someone who asked it not to.
+
+`example/lib/main.dart` has a switch that turns the flag on for the feed below
+it, so both states are visible on a machine that has the setting switched off.
+The figure comes from `tool/capture_reduced_motion.sh`, and that run asserts the
+two columns really do behave differently before it writes the file.
 
 ## Skeleton primitives
 

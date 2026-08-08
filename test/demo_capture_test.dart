@@ -13,9 +13,10 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:skeleton_shimmer/skeleton_shimmer.dart';
+
+import 'doc_capture_support.dart';
 
 const _captureKey = ValueKey('demo-capture');
 final _frameDir = Directory('/tmp/demo_skeleton_shimmer');
@@ -29,7 +30,7 @@ void main() {
     tester.view.physicalSize = const Size(1600, 1200);
     tester.view.devicePixelRatio = 2.0;
     addTearDown(tester.view.reset);
-    await _loadRealFonts(tester);
+    await loadMaterialFonts(tester);
 
     final loaded = ValueNotifier(false);
     addTearDown(loaded.dispose);
@@ -49,37 +50,6 @@ void main() {
       await _capture(tester);
     }
   });
-}
-
-/// The default test font renders every glyph as a box; load the SDK's
-/// bundled Roboto and MaterialIcons so the captures look like a real app.
-Future<void> _loadRealFonts(WidgetTester tester) async {
-  await tester.runAsync(() async {
-    final fonts = _materialFontsDir();
-    Future<ByteData> read(String name) async =>
-        ByteData.sublistView(await File('${fonts.path}/$name').readAsBytes());
-    final roboto = FontLoader('Roboto')
-      ..addFont(read('Roboto-Regular.ttf'))
-      ..addFont(read('Roboto-Medium.ttf'))
-      ..addFont(read('Roboto-Bold.ttf'));
-    await roboto.load();
-    final icons = FontLoader('MaterialIcons')
-      ..addFont(read('MaterialIcons-Regular.otf'));
-    await icons.load();
-  });
-}
-
-Directory _materialFontsDir() {
-  var dir = File(Platform.resolvedExecutable).parent;
-  while (true) {
-    final fonts = Directory('${dir.path}/bin/cache/artifacts/material_fonts');
-    if (fonts.existsSync()) return fonts;
-    final parent = dir.parent;
-    if (parent.path == dir.path) {
-      throw StateError('material_fonts not found above $dir');
-    }
-    dir = parent;
-  }
 }
 
 Future<void> _capture(WidgetTester tester) async {
