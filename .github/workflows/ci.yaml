@@ -23,6 +23,15 @@ jobs:
       - run: dart format --output=none --set-exit-if-changed .
       - run: flutter analyze
       - run: flutter test --exclude-tags demo
+
+      # doc/reduced-motion.png comes out of this test, and the run asserts what
+      # the figure is evidence for before it writes anything: the default column
+      # has to change between frames, the disableAnimations column has to stay
+      # put. shimmer_test.dart already covers that behaviour; the demo tag keeps
+      # this file out of the suite above, so what this line adds is that the
+      # published figure cannot drift away from the behaviour it depicts.
+      - run: flutter test --tags demo test/reduced_motion_capture_test.dart
+
       - run: flutter pub get
         working-directory: example
       - run: flutter analyze
