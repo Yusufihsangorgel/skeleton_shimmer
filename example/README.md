@@ -23,6 +23,32 @@ Shimmer.fromColors(
 // When the data is in, show the real widgets instead.
 ```
 
+## Reduce motion
+
+The switch above the feed stands in for the platform's own setting (iOS Reduce
+Motion, Android Remove animations). Turn it on and the sweep freezes on the
+base color while the rows keep showing the shape of what is loading. Nothing in
+the app talks to `Shimmer` about motion; it reports what the platform asked for
+and `Shimmer` decides.
+
+```dart
+final platform = MediaQuery.of(context);
+
+// copyWith, and the ||, so a demo switch can only add the request. Writing
+// `disableAnimations: simulateReduceMotion` would overwrite a real Reduce
+// Motion setting with false the moment the switch was off.
+MediaQuery(
+  data: platform.copyWith(
+    disableAnimations: platform.disableAnimations || simulateReduceMotion,
+  ),
+  child: feed,
+);
+```
+
+On a device that already asks for reduced motion the switch is disabled: there
+is nothing left to turn on, and the only thing it could do is write over the
+answer the user already gave.
+
 Run it:
 
 ```
