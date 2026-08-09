@@ -8,6 +8,40 @@ placeholders with one highlight sweeping across them, then the real
 conversations fading
 in](https://raw.githubusercontent.com/Yusufihsangorgel/skeleton_shimmer/main/doc/demo.gif)
 
+![A skeleton inbox: a header block and five rows of avatar and text placeholders with the highlight sweeping across, then the real conversations fading in](https://raw.githubusercontent.com/Yusufihsangorgel/skeleton_shimmer/main/doc/demo.webp)
+
+## Why this instead of what you already have
+
+**Instead of a hand-rolled `ShaderMask`.** `ShaderMask` is a
+`SingleChildRenderObjectWidget` that takes `shaderCallback`, `blendMode` and
+`child` (`widgets/basic.dart:425`). It holds no shared state, so two of them
+cannot be put on one clock, and five cards peak at the same instant instead of
+one band crossing the screen.
+
+**Instead of `shimmer`.** Its `initState` builds a private
+`AnimationController(vsync: this, duration: widget.period)`
+(`lib/shimmer.dart:130`), one clock per widget by construction. Issue #24,
+"Synchronize multiple `Shimmers` automatically", has been open since March
+2020. It also never asks about reduced motion: `disableAnimations`,
+`AccessibilityFeatures` and `MediaQuery` appear nowhere in its source. The
+default `loop: 0` path calls `repeat()` (`lib/shimmer.dart:137`), and
+`AnimationController.repeat()` hands off to a `_RepeatingSimulation` with no
+`animationBehavior` check (`animation_controller.dart:717`), so the sweep keeps
+running at full speed after the platform has asked for it to stop.
+
+**Reach for it when**
+
+- A list or grid of placeholder cards should read as one surface rather than as
+  tiles blinking on their own schedules.
+- You ship to users who turn reduce motion on and the placeholder still has to
+  be visible while it is held still.
+- Placeholders scroll through a list and the band should belong to the screen
+  rather than travel with each row.
+
+Skip it for a single placeholder on a screen: one shimmer has nothing to
+synchronize, and `shimmer` is the more widely used dependency at roughly 1.4M
+downloads a month.
+
 Two shimmers on a screen are two animations. Each one owns a clock and sweeps
 its highlight across its own box. Five cards give you five highlights peaking
 at the same instant rather than one band crossing the screen. `ShimmerScope`
@@ -67,7 +101,6 @@ Shimmer.fromColors(
 )
 ```
 
-![A skeleton inbox: a header block and five rows of avatar and text placeholders with the highlight sweeping across, then the real conversations fading in](https://raw.githubusercontent.com/Yusufihsangorgel/skeleton_shimmer/main/doc/demo.webp)
 
 ## What a scope does and does not take over
 
