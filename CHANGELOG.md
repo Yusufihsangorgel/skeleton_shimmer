@@ -1,3 +1,29 @@
+## 1.1.0
+
+- Add `ShimmerScope`, which puts every `Shimmer` below it on one clock and one
+  band. On their own, five cards are five animations: each widget starts its
+  own controller when it mounts and sweeps a full highlight across its own
+  box, and all five peak at the same moment. Under a scope, each widget paints
+  the slice of one shared sweep that lands where the widget is. One band
+  crosses the screen.
+- The scope owns `period` and `loop`, because those describe the clock.
+  Colors, `direction`, `enabled` and `semanticsLabel` stay on each widget. A
+  widget with `enabled: false` holds still on the part of the band it was
+  showing while its neighbours keep going, and reduced motion freezes the
+  shared clock the way it froze a lone widget's.
+- The band is anchored to the scope's box, and a widget's offset inside it is
+  resolved during paint rather than at build time. A row scrolling through a
+  scoped list therefore moves through the band instead of carrying a copy
+  along.
+- A `Shimmer` with no scope above it renders the pixels it rendered in 1.0.1.
+  `test/shimmer_scope_test.dart` keeps a transcription of that implementation
+  and renders the two side by side on one clock, comparing every pixel at
+  eight points of a sweep in each of the four directions.
+- The example is now a small dashboard with two switches: one wraps the feed
+  in a `ShimmerScope`, the other stands in for the platform's reduced-motion
+  setting. The README's figures are captured from widget-test runs that
+  assert the difference they illustrate before writing the file.
+
 ## 1.0.1
 
 - Add `example/README.md` for pub.dev's Example tab. It describes the demo's
