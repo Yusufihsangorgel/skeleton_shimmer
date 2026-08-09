@@ -180,24 +180,24 @@ Future<Uint8List> _compose(List<_Frame> frames) async {
   canvas.drawRect(const Rect.fromLTWH(0, 0, width, height),
       Paint()..color = const Color(0xFFF8FAFC));
 
-  _text(canvas, 'Default',
+  drawText(canvas, 'Default',
       style: header,
       x: pairX + _cardWidth / 2,
       centerY: pad + headerHeight / 2,
-      anchor: _Anchor.center);
-  _text(canvas, 'disableAnimations: true',
+      anchor: TextAnchor.center);
+  drawText(canvas, 'disableAnimations: true',
       style: header,
       x: pairX + _cardWidth * 1.5 + _gutter,
       centerY: pad + headerHeight / 2,
-      anchor: _Anchor.center);
+      anchor: TextAnchor.center);
 
   for (var i = 0; i < frames.length; i++) {
     final top = pad + headerHeight + i * (_cardHeight + rowGap);
-    _text(canvas, 't = ${(_step * i).inMilliseconds} ms',
+    drawText(canvas, 't = ${(_step * i).inMilliseconds} ms',
         style: label,
         x: pad + labelWidth - 14,
         centerY: top + _cardHeight / 2,
-        anchor: _Anchor.right);
+        anchor: TextAnchor.right);
     final image = frames[i].image;
     canvas.drawImageRect(
       image,
@@ -207,7 +207,7 @@ Future<Uint8List> _compose(List<_Frame> frames) async {
     );
   }
 
-  _text(
+  drawText(
       canvas,
       'One ${_period.inMilliseconds} ms sweep, sampled every '
       '${_step.inMilliseconds} ms. Same widget, same frame, same colors.',
@@ -222,29 +222,6 @@ Future<Uint8List> _compose(List<_Frame> frames) async {
   final png = await image.toByteData(format: ui.ImageByteFormat.png);
   image.dispose();
   return png!.buffer.asUint8List();
-}
-
-enum _Anchor { left, center, right }
-
-void _text(
-  Canvas canvas,
-  String text, {
-  required TextStyle style,
-  required double x,
-  required double centerY,
-  _Anchor anchor = _Anchor.left,
-}) {
-  final painter = TextPainter(
-    text: TextSpan(text: text, style: style),
-    textDirection: TextDirection.ltr,
-  )..layout();
-  final dx = switch (anchor) {
-    _Anchor.left => x,
-    _Anchor.center => x - painter.width / 2,
-    _Anchor.right => x - painter.width,
-  };
-  painter.paint(canvas, Offset(dx, centerY - painter.height / 2));
-  painter.dispose();
 }
 
 /// The captured subject: two identical cards, one told the platform wants no

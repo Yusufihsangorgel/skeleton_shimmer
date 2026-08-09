@@ -1,0 +1,21 @@
+# pub reads this instead of .gitignore for the whole package, so the first
+# block has to repeat .gitignore before the second one can add to it. Keep the
+# two in step.
+.dart_tool/
+build/
+pubspec.lock
+.idea/
+.metadata
+.flutter-plugins*
+
+# Artwork the README links to, and one intermediate.
+#
+# pub.dev serves README images by proxying to the repository rather than by
+# reading them out of the archive, so nothing linked from prose needs to ship
+# here. `screenshots:` entries are the exception: those are read from the
+# archive, and the three listed in pubspec.yaml are deliberately not in this
+# list. Dropping these takes the download from 820 KB to about 155 KB.
+doc/banner.png
+doc/banner.svg
+doc/blog/
+doc/demo.gif

@@ -1,15 +1,22 @@
-// skeleton_shimmer example: a skeleton feed while the data loads, and the
-// accessibility switch that decides whether it moves.
+// skeleton_shimmer example: a skeleton dashboard while the data loads, with
+// the two switches that decide how it moves.
 //
 // The loading pattern is the easy half. Mirror the layout that is coming with
 // SkeletonCircle/SkeletonLine, put a Shimmer over it, swap in the real rows
 // once the data arrives. The FAB stands in for the request completing.
 //
-// The switch is the half worth reading. A skeleton with `loop: 0` sweeps for
-// as long as the request takes, which is motion the user never started and
-// cannot predict the end of. Reduce Motion (iOS) and Remove animations
-// (Android) exist to stop exactly that, and for someone with a vestibular
-// disorder it is a symptom trigger rather than a preference.
+// The first switch is the one to try first. This screen has seven separate
+// Shimmers, which is what you get from any builder that returns a card: each
+// one owns a clock and sweeps the highlight across its own box, and the three
+// stat tiles peak together because each is running its own full sweep across
+// 100-odd pixels. ShimmerScope hands all seven one clock and one band, and
+// each widget paints the slice of it that lands where the widget is.
+//
+// The second switch is the accessibility half. A skeleton with `loop: 0`
+// sweeps for as long as the request takes, which is motion the user never
+// started and cannot predict the end of. Reduce Motion (iOS) and Remove
+// animations (Android) exist to stop exactly that, and for someone with a
+// vestibular disorder it is a symptom trigger rather than a preference.
 //
 // Honouring it costs nothing here: `Shimmer` reads
 // `MediaQuery.disableAnimationsOf(context)` and stops the sweep, keeping the
@@ -54,6 +61,7 @@ class DemoScreen extends StatefulWidget {
 
 class _DemoScreenState extends State<DemoScreen> {
   bool _loading = true;
+  bool _shareOneSweep = true;
   bool _simulateReduceMotion = false;
 
   @override
@@ -71,6 +79,17 @@ class _DemoScreenState extends State<DemoScreen> {
       body: Column(
         children: [
           SwitchListTile(
+            value: _shareOneSweep,
+            onChanged: (value) => setState(() => _shareOneSweep = value),
+            title: const Text('Share one sweep'),
+            subtitle: Text(
+              _shareOneSweep
+                  ? 'One ShimmerScope over the feed: one band crosses it.'
+                  : 'A Shimmer per card: every card peaks at once.',
+            ),
+            secondary: const Icon(Icons.view_week_outlined),
+          ),
+          SwitchListTile(
             value: _simulateReduceMotion || platformAsks,
             // Nothing to toggle when the device already asked: the sweep is
             // frozen either way, and pretending otherwise would mean writing
@@ -83,9 +102,10 @@ class _DemoScreenState extends State<DemoScreen> {
             secondary: const Icon(Icons.accessibility_new),
           ),
           const Divider(height: 1),
-          // Only the feed is wrapped, so this switch keeps its own animation
-          // and stays readable while the shimmer under it is frozen. On a
-          // device the flag arrives at the root and covers the whole tree.
+          // Only the feed is wrapped, so these switches keep their own
+          // animation and stay readable while the shimmer under them is
+          // frozen. On a device the flag arrives at the root and covers the
+          // whole tree.
           Expanded(child: _feed(context)),
         ],
       ),
@@ -131,54 +151,171 @@ class _DemoScreenState extends State<DemoScreen> {
       data: platform.copyWith(
         disableAnimations: platform.disableAnimations || _simulateReduceMotion,
       ),
-      child: _loading ? const _SkeletonList() : const _LoadedList(),
+      child: _loading
+          ? _SkeletonDashboard(shareOneSweep: _shareOneSweep)
+          : const _LoadedDashboard(),
     );
   }
 }
 
-class _SkeletonList extends StatelessWidget {
-  const _SkeletonList();
+class _SkeletonDashboard extends StatelessWidget {
+  const _SkeletonDashboard({required this.shareOneSweep});
+
+  final bool shareOneSweep;
 
   @override
   Widget build(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: ListView.builder(
-        itemCount: 8,
-        // A skeleton is only useful if it resembles the row it stands in for,
-        // and `ListTile` gets in the way here: it lays its title and subtitle
-        // out with a tightened width, so a bare `SkeletonLine(width: 180)`
-        // comes out stretched across the whole row and every placeholder ends
-        // up the same length. `Align` hands the line its own width back.
-        itemBuilder: (context, index) => const ListTile(
-          leading: SkeletonCircle(size: 40),
-          title: Align(
-            alignment: Alignment.centerLeft,
-            child: SkeletonLine(width: 180),
-          ),
-          subtitle: Align(
-            alignment: Alignment.centerLeft,
-            child: SkeletonLine(width: 120, height: 12),
-          ),
+    const feed = _SkeletonFeed();
+    // The only difference between the two states of the first switch. Nothing
+    // below this line knows which one it is in.
+    return shareOneSweep ? const ShimmerScope(child: feed) : feed;
+  }
+}
+
+class _SkeletonFeed extends StatelessWidget {
+  const _SkeletonFeed();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        // Three tiles side by side are where the two states look least alike:
+        // each one is only a third of the width, so a sweep of its own is a
+        // full highlight crossing 100 px while the shared one is a slice.
+        const Row(
+          children: [
+            Expanded(child: _SkeletonCard(lines: 2, height: 76)),
+            SizedBox(width: 12),
+            Expanded(child: _SkeletonCard(lines: 2, height: 76)),
+            SizedBox(width: 12),
+            Expanded(child: _SkeletonCard(lines: 2, height: 76)),
+          ],
+        ),
+        const SizedBox(height: 16),
+        for (var i = 0; i < 4; i++) ...[
+          const _SkeletonRow(),
+          const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+/// One card, with its own `Shimmer`. A builder that returns a card is how most
+/// screens end up with a Shimmer each.
+class _SkeletonCard extends StatelessWidget {
+  const _SkeletonCard({required this.lines, required this.height});
+
+  final int lines;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey.shade300,
+        highlightColor: Colors.grey.shade100,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var i = 0; i < lines; i++) ...[
+              if (i > 0) const SizedBox(height: 8),
+              SkeletonLine(height: i == 0 ? 14 : 10),
+            ],
+          ],
         ),
       ),
     );
   }
 }
 
-class _LoadedList extends StatelessWidget {
-  const _LoadedList();
+class _SkeletonRow extends StatelessWidget {
+  const _SkeletonRow();
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 8,
-      itemBuilder: (context, index) => ListTile(
-        leading: CircleAvatar(child: Text('$index')),
-        title: Text('Item $index'),
-        subtitle: const Text('Loaded content'),
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: const Row(
+        children: [
+          SkeletonCircle(size: 40),
+          SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SkeletonLine(width: 180),
+                SizedBox(height: 8),
+                SkeletonLine(width: 120, height: 12),
+              ],
+            ),
+          ),
+        ],
       ),
+    );
+  }
+}
+
+class _LoadedDashboard extends StatelessWidget {
+  const _LoadedDashboard();
+
+  static const _stats = [
+    ('Revenue', '\$12.4k'),
+    ('Orders', '318'),
+    ('Refunds', '4')
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Row(
+          children: [
+            for (final (index, stat) in _stats.indexed) ...[
+              if (index > 0) const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  height: 76,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: theme.dividerColor),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(stat.$2, style: theme.textTheme.titleMedium),
+                      Text(stat.$1, style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+        const SizedBox(height: 16),
+        for (var i = 0; i < 4; i++)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: CircleAvatar(child: Text('$i')),
+            title: Text('Item $i'),
+            subtitle: const Text('Loaded content'),
+          ),
+      ],
     );
   }
 }
