@@ -15,10 +15,6 @@ topics:
 
 screenshots:
   - description: >-
-      A skeleton inbox loading: one highlight sweeps across every placeholder
-      as a single band, then the real content fades in.
-    path: doc/demo.gif
-  - description: >-
       The same cards at four points of one sweep: a Shimmer each on the left
       lights them all at once, one ShimmerScope on the right sends a single
       band across.
