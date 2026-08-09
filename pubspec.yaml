@@ -3,7 +3,7 @@ description: >-
   Shimmer loading effect and skeleton loaders for Flutter. One sweep shared
   across every placeholder on the screen, API-compatible with the shimmer
   package, with reduced-motion accessibility.
-version: 1.1.0
+version: 1.1.1
 repository: https://github.com/Yusufihsangorgel/skeleton_shimmer
 
 topics:
@@ -14,6 +14,10 @@ topics:
   - animation
 
 screenshots:
+  - description: >-
+      A skeleton inbox loading: one highlight sweeps across every placeholder
+      as a single band, then the real content fades in.
+    path: doc/demo.gif
   - description: >-
       The same cards at four points of one sweep: a Shimmer each on the left
       lights them all at once, one ShimmerScope on the right sends a single

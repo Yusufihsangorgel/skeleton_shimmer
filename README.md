@@ -1,5 +1,13 @@
 # skeleton_shimmer
 
+Loading placeholders whose highlight sweeps as one band across the whole
+screen, instead of every card lighting up at the same instant.
+
+![A skeleton inbox: a header block and five rows of avatar and text
+placeholders with one highlight sweeping across them, then the real
+conversations fading
+in](https://raw.githubusercontent.com/Yusufihsangorgel/skeleton_shimmer/main/doc/demo.gif)
+
 Two shimmers on a screen are two animations. Each one owns a clock and sweeps
 its highlight across its own box. Five cards give you five highlights peaking
 at the same instant rather than one band crossing the screen. `ShimmerScope`
