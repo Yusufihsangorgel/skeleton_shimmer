@@ -117,6 +117,8 @@ ShimmerScope(
       baseColor: base,
       highlightColor: highlight,
       enabled: index != pinnedRow,
+      // Your row, not ours: this package paints the sweep over whatever
+      // you put here.
       child: SkeletonRow(index),
     ),
   ),
