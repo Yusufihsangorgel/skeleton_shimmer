@@ -1,3 +1,12 @@
+## 1.2.2
+
+- The package description in pubspec.yaml is now 166 characters. It was 192.
+  pub.dev wants it between 60 and 180 — search results truncate a longer one —
+  and was withholding 10 of the package's 160 pub points for it. It still
+  names the three things that distinguish the package: one sweep shared
+  across every placeholder, drop-in compatibility with the shimmer package,
+  and reduced-motion awareness.
+
 ## 1.2.1
 
 - The README sample now says which class in it is yours to write. It read like
