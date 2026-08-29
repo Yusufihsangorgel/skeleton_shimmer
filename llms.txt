@@ -1,0 +1,16 @@
+# skeleton_shimmer
+
+Shimmer loading effect and skeleton loaders for Flutter. One sweep shared across every placeholder, API-compatible with the shimmer package, and reduced-motion aware.
+
+pub.dev: https://pub.dev/packages/skeleton_shimmer
+source: https://github.com/Yusufihsangorgel/skeleton_shimmer
+
+## Before you call it
+
+README.md carries the usage, the measured comparison against the alternatives, and a note on when not to reach for this package.
+
+## Layout
+
+- `lib/` — public API
+- `example/` — runnable examples
+- `test/` — the suite; `dart test` (or `flutter test`) runs it
