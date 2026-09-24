@@ -7,11 +7,11 @@ version: 1.2.2
 repository: https://github.com/Yusufihsangorgel/skeleton_shimmer
 
 topics:
+  - skeleton-loader
+  - shimmer-effect
+  - loading-placeholder
+  - reduced-motion
   - shimmer
-  - skeleton
-  - loading
-  - placeholder
-  - animation
 
 screenshots:
   - description: >-
