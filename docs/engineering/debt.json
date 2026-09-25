@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "package": "skeleton_shimmer",
+  "survey_digest": "f90f45c8a172068c3ed3b9488ba5a7cb4e58efa93c380d2d9a70b399349ec35e",
+  "items": [
+    {
+      "id": "skeleton_shimmer-D001",
+      "source_index": 1,
+      "source_item_digest": "878c34acc7fb154c9ef1ee7b7d3bfbfe2841f181b57a3e5dea45accfbd80000b",
+      "baseline_revision": "59d173c",
+      "status": "open",
+      "size": "small",
+      "locations": [
+        {
+          "path": "lib/src/shimmer.dart",
+          "lines": "43-44,57-58,194-195"
+        }
+      ],
+      "kind": "duplicate default value",
+      "observation": "period 1500 ms and loop 0 are written as separate literals in three constructors.",
+      "certainty": "confirmed",
+      "proposed_fix": "Define private _defaultPeriod and _defaultLoop constants; let all three constructors use them.",
+      "related_rule_ids": [
+        "skeleton_shimmer/SS-02"
+      ],
+      "issue_url": null,
+      "closure_criteria": "Private _defaultPeriod and _defaultLoop constants supply all three constructors. The 1500 ms period and the loop 0 meaning stay unchanged.",
+      "review_trigger": "Before modifying the affected code",
+      "resolution": null
+    },
+    {
+      "id": "skeleton_shimmer-D002",
+      "source_index": 2,
+      "source_item_digest": "432888b7a4e80a22f540acdd4f3a93a5393b76248b3d1e28cbdf40228f141e90",
+      "baseline_revision": "59d173c",
+      "status": "open",
+      "size": "small",
+      "locations": [
+        {
+          "path": "lib/src/shimmer.dart",
+          "lines": "76-83"
+        }
+      ],
+      "kind": "external constant without a source (J3/D16)",
+      "observation": "The stops list in fromColors, [0.0, 0.35, 0.5, 0.65, 1.0], is taken from the shimmer package, but the dartdoc has no source link and no version it was taken against.",
+      "certainty": "confirmed",
+      "proposed_fix": "Verify the source live, then add the link and an 'as of' version or date. If it cannot be verified, do not write the claim.",
+      "related_rule_ids": [
+        "skeleton_shimmer/SS-02"
+      ],
+      "issue_url": null,
+      "closure_criteria": "The dartdoc on the stops list carries a verified source link with an as-of version or date, or the unverified claim is removed.",
+      "review_trigger": "Before modifying the affected code",
+      "resolution": null
+    },
+    {
+      "id": "skeleton_shimmer-D003",
+      "source_index": 3,
+      "source_item_digest": "8a311116c1ae8b42d2b7c0c39ffae2638ce62109708662cee4c48e72f1038aec",
+      "baseline_revision": "59d173c",
+      "status": "open",
+      "size": "small",
+      "locations": [
+        {
+          "path": ".github/workflows/ci.yaml",
+          "lines": null
+        },
+        {
+          "path": "pubspec.yaml",
+          "lines": null
+        }
+      ],
+      "kind": "CI coverage gap",
+      "observation": "The base flutter >=3.22.0 declared in pubspec is not tested in CI.",
+      "certainty": "confirmed",
+      "proposed_fix": "Add 3.22.0 to the matrix; let the format check run on stable only.",
+      "related_rule_ids": [],
+      "issue_url": null,
+      "closure_criteria": "The CI matrix includes Flutter 3.22.0 beside stable, with the format check on stable only.",
+      "review_trigger": "Before modifying the affected code",
+      "resolution": null
+    }
+  ]
+}
