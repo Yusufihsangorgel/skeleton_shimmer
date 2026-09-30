@@ -1,3 +1,9 @@
+## 1.2.3
+
+- The README no longer quotes a monthly download figure for `shimmer`.
+- The example README now says to run `flutter create .` in `example` before
+  `flutter run`, because the example ships without platform folders.
+
 ## 1.2.2
 
 - The package description in pubspec.yaml is now 166 characters. It was 192.

@@ -62,10 +62,12 @@ On a device that already asks for reduced motion the switch is disabled: there
 is nothing left to turn on, and the only thing it could do is write over the
 answer the user already gave.
 
-Run it:
+The example ships without android, ios or web folders. Generate them once,
+then run it:
 
 ```
 cd example
+flutter create .
 flutter run
 ```
 

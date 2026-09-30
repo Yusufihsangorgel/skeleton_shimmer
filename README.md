@@ -39,8 +39,7 @@ running at full speed after the platform has asked for it to stop.
   rather than travel with each row.
 
 Skip it for a single placeholder on a screen: one shimmer has nothing to
-synchronize, and `shimmer` is the more widely used dependency at roughly 1.4M
-downloads a month.
+synchronize.
 
 Two shimmers on a screen are two animations. Each one owns a clock and sweeps
 its highlight across its own box. Five cards give you five highlights peaking
