@@ -1,5 +1,7 @@
 ## 1.2.3
 
+- The README now compares this package with `skeletonizer` and says when to
+  pick that one instead.
 - The README no longer quotes a monthly download figure for `shimmer`.
 - The example README now says to run `flutter create .` in `example` before
   `flutter run`, because the example ships without platform folders.

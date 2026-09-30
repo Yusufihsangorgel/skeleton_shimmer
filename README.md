@@ -29,6 +29,16 @@ default `loop: 0` path calls `repeat()` (`lib/shimmer.dart:137`), and
 `animationBehavior` check (`animation_controller.dart:717`), so the sweep keeps
 running at full speed after the platform has asked for it to stop.
 
+**Instead of `skeletonizer`.** It solves a different part of the problem.
+`Skeletonizer` wraps the real widget tree and paints bones over it. You do not
+write a second layout. This package has no generator: you build the
+skeleton yourself from `SkeletonBox`, `SkeletonCircle` and `SkeletonLine`. What
+you get for that work is control over the sweep. In skeletonizer 3.0.0 each
+`Skeletonizer` widget creates its own `AnimationController`
+(`lib/src/widgets/skeletonizer.dart:212`), and its source has no reference to
+`disableAnimations`. One `Skeletonizer` around a whole screen is one
+controller. The synchronization question only comes up when you use several.
+
 **Reach for it when**
 
 - A list or grid of placeholder cards should read as one surface rather than as
@@ -37,9 +47,13 @@ running at full speed after the platform has asked for it to stop.
   be visible while it is held still.
 - Placeholders scroll through a list and the band should belong to the screen
   rather than travel with each row.
+- You want to draw the skeleton yourself, and it should differ from the loaded
+  layout.
 
 Skip it for a single placeholder on a screen: one shimmer has nothing to
-synchronize.
+synchronize. Skip it as well when you want skeletons generated from a layout
+that already exists. That is what `skeletonizer` does and this package does
+not.
 
 Two shimmers on a screen are two animations. Each one owns a clock and sweeps
 its highlight across its own box. Five cards give you five highlights peaking
