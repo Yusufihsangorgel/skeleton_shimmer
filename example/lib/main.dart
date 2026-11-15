@@ -34,6 +34,7 @@
 // repeating animations "from flashing rapidly on the screen if the widget
 // does not take the disableAnimations flag into account".
 
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:skeleton_shimmer/skeleton_shimmer.dart';
 
