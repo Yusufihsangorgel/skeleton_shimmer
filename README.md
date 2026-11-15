@@ -1,5 +1,9 @@
 # skeleton_shimmer
 
+**Status:** no new releases are planned. For new projects,
+[`skeletonizer`](https://pub.dev/packages/skeletonizer) builds the skeleton from
+the widgets you already have.
+
 Loading placeholders whose highlight sweeps as one band across the whole
 screen, instead of every card lighting up at the same instant.
 
